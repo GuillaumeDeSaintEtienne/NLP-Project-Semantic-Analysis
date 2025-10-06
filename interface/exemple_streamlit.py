@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly as plt
+import pandas as pd
 
 st.set_page_config(page_title="Job Finder", page_icon="💼", layout="centered")
 
@@ -26,6 +27,9 @@ with st.form("job_form"):
     submitted = st.form_submit_button("🔍 Find My Job")
 
 if submitted:
+    df = pd.DataFrame(columns=["name", "age", "education", "field", "experience", "skills", "interests", "work_env", "salary", "location", "submitted"])
+    df.loc[df.shape[0]+1] = [name, age, education, field, experience, skills, interests, work_env, salary, location, submitted]
+    
     st.success(f"Thanks {name}! I'm analyzing your responses... 💭")
     
     # --- Placeholder output ---
