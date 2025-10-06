@@ -1,0 +1,51 @@
+CompetencyID,Competency,BlockID,BlockName
+C01,Data cleaning,1,Data Analysis
+C02,Data visualization,1,Data Analysis
+C03,Python programming,1,Data Analysis
+C04,Statistics,1,Data Analysis
+C05,SQL,1,Data Analysis
+C06,Regression,2,Machine Learning
+C07,Classification,2,Machine Learning
+C08,Clustering,2,Machine Learning
+C09,Model evaluation,2,Machine Learning
+C10,Feature engineering,2,Machine Learning
+C11,Tokenization,3,NLP
+C12,Word embeddings,3,NLP
+C13,Transformers,3,NLP
+C14,Text classification,3,NLP
+C15,Named Entity Recognition,3,NLP
+C16,ETL pipelines,4,Data Engineering
+C17,Data warehousing,4,Data Engineering
+C18,Airflow,4,Data Engineering
+C19,Spark,4,Data Engineering
+C20,Data lakes,4,Data Engineering
+C21,AWS,5,Cloud Computing
+C22,Azure,5,Cloud Computing
+C23,GCP,5,Cloud Computing
+C24,Containerization,5,Cloud Computing
+C25,Serverless computing,5,Cloud Computing
+C26,CI/CD,6,MLOps / DevOps
+C27,Model deployment,6,MLOps / DevOps
+C28,Docker,6,MLOps / DevOps
+C29,Kubernetes,6,MLOps / DevOps
+C30,Monitoring,6,MLOps / DevOps
+C31,Image preprocessing,7,Computer Vision
+C32,CNN,7,Computer Vision
+C33,Object detection,7,Computer Vision
+C34,Transfer learning,7,Computer Vision
+C35,OpenCV,7,Computer Vision
+C36,Hadoop,8,Big Data & Distributed Systems
+C37,Spark Streaming,8,Big Data & Distributed Systems
+C38,Kafka,8,Big Data & Distributed Systems
+C39,Distributed storage,8,Big Data & Distributed Systems
+C40,Parallel processing,8,Big Data & Distributed Systems
+C41,Tableau,9,Business Intelligence
+C42,Power BI,9,Business Intelligence
+C43,Dashboarding,9,Business Intelligence
+C44,Data storytelling,9,Business Intelligence
+C45,KPIs,9,Business Intelligence
+C46,Agile methodology,10,Project Management & Soft Skills
+C47,Scrum,10,Project Management & Soft Skills
+C48,Communication,10,Project Management & Soft Skills
+C49,Problem solving,10,Project Management & Soft Skills
+C50,Teamwork,10,Project Management & Soft Skills
