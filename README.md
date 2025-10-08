@@ -68,7 +68,11 @@ Once the virtual environment is activated, install the required Python libraries
 ```bash
 pip install -r requirements.txt
 ```
-
+To avoid conflict with notebook
+```bash
+pip install nbdime
+nbdime config-git --enable
+```
 ---
 
 ### 4️⃣ Run the project
