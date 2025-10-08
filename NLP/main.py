@@ -36,22 +36,33 @@ def graph_result():
     )
     return fig
 
-def preprocessing():
+
+def transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+                  tools, languages, frameworks, data_types, preferred_domains, experience_text):
+    data = {
+        "level_data_analysis": level_data_analysis,
+        "level_ml": level_ml,
+        "level_nlp": level_nlp,
+        "level_data_eng": level_data_eng,
+        "level_cloud": level_cloud,
+        "tools": tools,
+        "languages": languages,
+        "frameworks": frameworks,
+        "data_types": data_types,
+        "preferred_domains": preferred_domains,
+        "experience_text": experience_text
+    }
+    df = pd.DataFrame([data])
+    return df
+
+def preprocessing(df):
     return None
 
 
-def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text):
-    # df = pd.DataFrame(columns=[
-    #         "level_data_analysis", "level_ml", "level_nlp", "level_data_eng", "level_cloud",
-    #         "tools", "languages", "frameworks", "data_types", "preferred_domains",
-    #         "experience_text"
-    #     ])
-    # df.loc[df.shape[0]] = [
-    #     level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
-    #     tools, languages, frameworks, data_types, preferred_domains,
-    #     experience_text
-    # ]    
 
+def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text):
+    df=transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text)
+    df=preprocessing(df)
     fig = graph_result()
 
     return fig
