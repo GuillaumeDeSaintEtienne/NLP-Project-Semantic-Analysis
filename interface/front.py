@@ -13,7 +13,7 @@ def start():
     st.set_page_config(page_title="Job Finder", page_icon="💼", layout="centered")
     st.title("Find Your Ideal Job")
     st.write("Answer a few questions and find out the best job opportunities based on your profile.")
-
+    submitted = False
     with st.form("job_form"):
         st.header("👤 Your Profile")
 
@@ -37,13 +37,20 @@ def start():
         # This just returns True when clicked
         submitted = st.form_submit_button("🔍 Find My Job")
 
-    if submitted:
+    if submitted and all([
+        level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+        tools, languages, frameworks, data_types, preferred_domains, experience_text
+    ]):
         fig = main.nlp(
             level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
             tools, languages, frameworks, data_types, preferred_domains,
             experience_text
         )
+
         st.plotly_chart(fig, use_container_width=True)
+    else : 
+        submitted = False
+        st.warning("⚠️ Please fill in all the fields before submitting!")
 
 
 
