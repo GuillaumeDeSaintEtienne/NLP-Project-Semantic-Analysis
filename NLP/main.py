@@ -1,19 +1,10 @@
 import pandas as pd 
-import numpy as np 
 import re 
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, precision_score, recall_score
 import plotly.graph_objects as go
 import nltk
-import os
+from pathlib import Path
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
-
-from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer, util
 
 nltk.download('punkt')
@@ -26,6 +17,7 @@ print("Loading SBERT model...")
 #MODEL_ID = 'all-MiniLM-L6-v2'
 MODEL_ID = 'all-mpnet-base-v2'
 print("Model loaded.")
+data_path = Path.cwd() / "data"
 
 
 
@@ -51,16 +43,11 @@ def graph_result(jobScores):
 
 def loadData():
     try:
-        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
-        data_path = os.path.join(base_path, "data")
-
-        comp_file = os.path.join(data_path, "competencies.csv")
-        jobs_file = os.path.join(data_path, "jobs.csv")
-
-        df_competencies = pd.read_csv(comp_file, sep=",")
-        df_jobs = pd.read_csv(jobs_file, sep=",")
+        df_competencies = pd.read_csv(data_path / r"competencies.csv", sep=",")
+        df_jobs = pd.read_csv(data_path / r"jobs.csv", sep=",")
 
         df_jobs["RequiredCompetencies"] = df_jobs["RequiredCompetencies"].apply(lambda x: x.split(";"))
+        
     except FileNotFoundError:
         print("Error: Make sure 'competencies.csv' and 'jobs.csv' are in a 'data' folder at the project root.")
         df_competencies = pd.DataFrame()
