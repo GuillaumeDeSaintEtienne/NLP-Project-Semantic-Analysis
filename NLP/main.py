@@ -1,47 +1,64 @@
 import pandas as pd 
 from sentence_transformers import SentenceTransformer, util
 import plotly.graph_objects as go
-from pathlib import Path
-import numpy as np
+import nltk
+import os
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import LinearSVC
 
-MODEL_ID = "all-MiniLM-L6-v2"
+from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import SentenceTransformer, util
 
-data_path = Path.cwd() / "data"
- 
+nltk.download('punkt')
+nltk.download('punkt_tab')  
+nltk.download('stopwords')
+nltk.download('wordnet')
 
-def loadData():
-
-    df_competencies = pd.read_csv(data_path / r"competencies.csv", sep=",")
-    df_jobs = pd.read_csv(data_path / r"jobs.csv", sep=",")
-
-    df_jobs["RequiredCompetencies"] = df_jobs["RequiredCompetencies"].apply(lambda x: x.split(";"))
-
-    return df_competencies,df_jobs
+# --- Étape 1: Chargement du modèle et des données ---
+print("Loading SBERT model...")
+model = SentenceTransformer('all-mpnet-base-v2')
+print("Model loaded.")
 
 
-def graph_result(df_jobs, block_scores):
+
+
+
+def graph_result(jobScores):
     fig = go.Figure()
 
-    categories = ['Technical Skills', 'Analytical Thinking', 'Communication', 'Creativity', 'Domain Knowledge']
+    bestJobsTitle = [job for job, score, topSkills in jobScores]
+    bestJobsScoresValues = [round(score * 100, 2) for job, score, topSkills in jobScores]
 
-    # Example job skill profiles
-    data_analyst = [8, 9, 7, 6, 8]
-    data_scientist = [9, 9, 6, 7, 9]
-    ml_engineer = [10, 8, 6, 5, 8]
-    business_analyst = [7, 8, 9, 6, 8]
-
-    # Add radar traces
-    fig.add_trace(go.Scatterpolar(r=data_analyst, theta=categories, fill='toself', name='Data Analyst'))
-    fig.add_trace(go.Scatterpolar(r=data_scientist, theta=categories, fill='toself', name='Data Scientist'))
-    fig.add_trace(go.Scatterpolar(r=ml_engineer, theta=categories, fill='toself', name='ML Engineer'))
-    fig.add_trace(go.Scatterpolar(r=business_analyst, theta=categories, fill='toself', name='Business Analyst'))
-
+    fig = go.Figure(data=go.Scatterpolar(r=bestJobsScoresValues, theta=bestJobsTitle, fill='toself', name='Profile Match'))
     fig.update_layout(
-        polar=dict(radialaxis=dict(visible=True, range=[0, 10])),
-        showlegend=True,
-        title="📊 Job Profile Match Comparison"
+        polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+        title="Overall Job Profile Match (Weighted)"
     )
+    
     return fig
+
+
+def loadData():
+    try:
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+        data_path = os.path.join(base_path, "data")
+
+        comp_file = os.path.join(data_path, "competencies.csv")
+        jobs_file = os.path.join(data_path, "jobs.csv")
+
+        df_competencies = pd.read_csv(comp_file, sep=",")
+        df_jobs = pd.read_csv(jobs_file, sep=",")
+
+        df_jobs["RequiredCompetencies"] = df_jobs["RequiredCompetencies"].apply(lambda x: x.split(";"))
+    except FileNotFoundError:
+        print("Error: Make sure 'competencies.csv' and 'jobs.csv' are in a 'data' folder at the project root.")
+        df_competencies = pd.DataFrame()
+        df_jobs = pd.DataFrame()
+
+    return df_competencies,df_jobs
 
 
 def transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
@@ -62,58 +79,110 @@ def transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, leve
     df = pd.DataFrame([data])
     return df
 
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r"[^a-zA-Z0-9\s]", " ", text)
+    tokens = word_tokenize(text)
+    tokens = [t for t in tokens if t not in stopwords.words('english') and len(t) > 2]
+    return " ".join(tokens)
+
 def preprocessing(df):
-    for col in df.columns:
-        if "level" in col : 
-            df[col] = df[col].astype(int)
-        else : 
-            df[col] = df[col].astype(str)
+    mappingLevel = {
+        1: "Beginner",
+        2: "Novice",
+        3: "Intermediate",
+        4: "Advanced",
+        5: "Expert"
+    }
+    mappingCompetence={"level_data_analysis":"python",
+                        "level_ml":"Machine Learning",
+                        "level_nlp":"NLP", 
+                        "level_data_eng":"Tokenization",
+                        "level_cloud":"Cloud Computing"
+    }
+    mappingExperience = {
+        "experience_text":"My experience includes:  ",
+        "tools":"I have used these tools and software:  ",
+        "languages":"I know the following programming languages: ",
+        "frameworks":"I am familiar with these frameworks and libraries: ",
+        "data_types":"I have worked with these types of data: ",
+        "preferred_domains":"I am interested in these domains: "
+    }
 
+    for col in df.columns:
+        if pd.api.types.is_integer_dtype(df[col]):
+            df[col] = df[col].apply(lambda numLevel: f"I am a {mappingLevel.get(numLevel)} in {mappingCompetence.get(col)}")
+
+        elif pd.api.types.is_string_dtype(df[col]):
+            if col in mappingExperience.keys():
+                df[col] = df[col].apply(lambda x: f"{mappingExperience[col]} {x}" if pd.notnull(x) and x != "" else "")
+            df[col] = df[col].fillna("").apply(clean_text)
     return df
-
-def processing_user_input(df, model):
-    user_embeddings = []
-    for col in df.columns:
-        if df[col].dtype != "int":
-            user_embeddings.append(model.encode(df[col].astype(str).tolist(), convert_to_tensor=True)) 
-    return user_embeddings
-
-
-
-def score(df, df_competencies, model):
-    user_embeddings = processing_user_input(df, model)
-    block_scores = {}
-
-    for block in df_competencies["BlockName"].unique():
-        # Get all competencies for this block and make sure they are strings
-        competencies = df_competencies["Competency"][df_competencies["BlockName"] == block]
-        block_embeddings = model.encode([str(c) for c in competencies if pd.notna(c)], convert_to_tensor=True)
-
-        all_max_sims = []
-
-        # Loop over each column's embeddings
-        for col_emb in user_embeddings:
-            similarities = util.cos_sim(col_emb, block_embeddings)
-            max_similarities = [float(sim.max()) for sim in similarities]
-            all_max_sims.extend(max_similarities)
-
-        block_scores[block] = np.mean(all_max_sims)
-
-    return block_scores
-
 
 
 def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text):
-    df=transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text)
-    df_competencies, df_jobs = loadData()
-    df=preprocessing(df)
-
-    block_scores = score(df, df_competencies, SentenceTransformer(MODEL_ID))
+    df_question=transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text)
+    df_question=preprocessing(df_question)
     
+    df_competencies, df_jobs = loadData()
 
-    fig = graph_result(df_jobs, block_scores)
+    #model = SentenceTransformer('all-MiniLM-L6-v2')
+    model = SentenceTransformer('all-mpnet-base-v2')
 
-    return fig
+    listQuestion=df_question.iloc[0]
+    userEmbedding = model.encode(listQuestion, convert_to_tensor=True)
+    print(userEmbedding)
+    compEmbeddings = model.encode(df_competencies["Competency"].tolist(), convert_to_tensor=True)
 
+    blockEmbeddings = model.encode(df_competencies["BlockName"].unique().tolist(), convert_to_tensor=True)
 
+    compCosineMatrix = util.cos_sim(userEmbedding, compEmbeddings).cpu().numpy()
+    compCosineScores = compCosineMatrix.max(axis=0)
+    df_competencies["similarity"] = compCosineScores
+
+    print(compCosineScores)
+    blockCosineMatrix = util.cos_sim(userEmbedding, blockEmbeddings).cpu().numpy()
+    blockCosineScores = blockCosineMatrix.max(axis=0)
+
+    df_competencies["weightedScore"] = df_competencies.apply(
+        lambda row: row["similarity"] * (1 + 0.3*blockCosineScores[row['BlockID']-1]),
+        axis=1
+    )
+
+    scoresByBlock = df_competencies.groupby("BlockName")["weightedScore"].mean().to_dict()
+    print(scoresByBlock)
+
+    jobScores = []
+ 
+    for _, job in df_jobs.iterrows():
+        jobComps = df_competencies[df_competencies["CompetencyID"].isin(job["RequiredCompetencies"])]
+        topCompScores = jobComps.sort_values(by='weightedScore', ascending=False).head(3)
+
+        jobScore = jobComps["weightedScore"].mean() if not jobComps.empty else 0
+        jobScores.append((
+            job["JobTitle"],
+            jobScore,
+            topCompScores["Competency"].tolist()
+        ))
+    jobScores.sort(key=lambda x: x[1], reverse=True)
+      
+        
+
+    print("\n=== 🧠 RECOMMANDATION DE MÉTIERS (SBERT) ===")
+    top3Jobs=[]
+    for job, score, topSkills in jobScores[:3]:
+        top3Jobs.append({
+            "title": job,
+            "score": round(score * 100, 2),
+            "matching_skills": topSkills
+            })
+        print(f"- {job}: {round(score, 3)}")
+
+    fig = graph_result(jobScores)
+
+    return {
+        "fig": fig,
+        "top_jobs": top3Jobs,
+        "block_scores": scoresByBlock
+    }
 

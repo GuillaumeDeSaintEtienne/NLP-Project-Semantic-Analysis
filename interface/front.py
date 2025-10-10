@@ -1,58 +1,97 @@
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
-
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+# --- Corrected Path Handling ---
+# Get the absolute path of the current file's directory (interface/)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Get the path of the parent directory (the project root)
+project_root = os.path.dirname(current_dir)
+# Add the project root to the system's path
+sys.path.append(project_root)
 
+# Now, Python can find the NLP module which is in a sibling directory
 from NLP import main
 
 def start():
-    st.set_page_config(page_title="Job Finder", page_icon="💼", layout="centered")
-    st.title("Find Your Ideal Job")
+    st.set_page_config(page_title="Job Finder", page_icon="💼", layout="wide")
+    st.title("Find Your Ideal Job 🔎")
     st.write("Answer a few questions and find out the best job opportunities based on your profile.")
-    submitted = False
+
     with st.form("job_form"):
         st.header("👤 Your Profile")
 
-        st.subheader("📊 Évaluez vos compétences (1 = Débutant, 5 = Expert)")
-        level_data_analysis = st.slider("1️⃣ Niveau en **Data Analysis**", 1, 5, 3)
-        level_ml = st.slider("2️⃣ Niveau en **Machine Learning / IA**", 1, 5, 2)
-        level_nlp = st.slider("3️⃣ Niveau en **NLP / Computer Vision**", 1, 5, 1)
-        level_data_eng = st.slider("4️⃣ Niveau en **Data Engineering**", 1, 5, 2)
-        level_cloud = st.slider("5️⃣ Niveau en **Cloud / MLOps**", 1, 5, 1)
-        
-        st.subheader("💡 Domaines & Outils")
-        tools = st.text_input("6️⃣ Outils / logiciels")
-        languages = st.text_input("7️⃣ Langages de programmation")
-        frameworks = st.text_input("8️⃣ Frameworks / librairies IA")
-        data_types = st.text_input("9️⃣ Types de données manipulés")
-        preferred_domains = st.text_input("🔟 Domaines / types de projets")
-        
-        st.subheader("📝 Votre expérience")
-        experience_text = st.text_area("1️⃣1️⃣ Décrivez votre expérience")
+        # Using columns for a cleaner layout
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("📊 Rate Your Skills (1-Beginner, 5-Expert)")
+            level_data_analysis = st.slider("Data Analysis", 1, 5, 3)
+            level_ml = st.slider("Machine Learning / AI", 1, 5, 2)
+            level_nlp = st.slider("NLP / Computer Vision", 1, 5, 1)
+            level_data_eng = st.slider("Data Engineering", 1, 5, 2)
+            level_cloud = st.slider("Cloud / MLOps", 1, 5, 1)
 
-        # This just returns True when clicked
+        with col2:
+            st.subheader("💡 Domains & Tools")
+            tools = st.text_input("Tools / software (e.g., Power BI, Excel)")
+            languages = st.text_input("Programming languages (e.g., Python, R, SQL)")
+            frameworks = st.text_input("AI frameworks / libraries (e.g., Scikit-learn, Pandas)")
+            data_types = st.text_input("Types of data handled (e.g., tabular, text, images)")
+            preferred_domains = st.text_input("Preferred domains (e.g., finance, healthcare)")
+        
+        st.subheader("📝 Describe Your Experience")
+        experience_text = st.text_area("Provide a summary of your projects and professional experience.", height=150)
+
         submitted = st.form_submit_button("🔍 Find My Job")
 
-    if submitted and all([
-        level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
-        tools, languages, frameworks, data_types, preferred_domains, experience_text
-    ]):
-        fig = main.nlp(
-            level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
-            tools, languages, frameworks, data_types, preferred_domains,
-            experience_text
-        )
+    if submitted:
+        if all([level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+        tools, languages, frameworks, data_types, preferred_domains,
+        experience_text]):
+        
+            if not all([tools, languages, frameworks, experience_text]):
+                st.warning("⚠️ Please fill in all the text fields for an accurate analysis!")
+            else:
+                with st.spinner('Analyzing your profile...'):
+                    results = main.nlp(
+                        level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+                        tools, languages, frameworks, data_types, preferred_domains,
+                        experience_text
+                    )
 
-        st.plotly_chart(fig, use_container_width=True)
-    else : 
-        submitted = False
-        st.warning("⚠️ Please fill in all the fields before submitting!")
+                if results:
+                    st.header("📈 Your Personalized Results Dashboard")
+                    st.subheader("🏆 Your Top 3 Job Recommendations")
+                    cols = st.columns(3)
+                    for i, job in enumerate(results["top_jobs"]):
+                        with cols[i]:
+                            st.metric(label=job['title'], value=f"{job['score']}% Match")
+                            with st.expander("Why this recommendation?"):
+                                st.write("This role is a good fit because of your skills in:")
+                                for skill in job['matching_skills']:
+                                    st.markdown(f"- **{skill}**")
+                    
+                    st.markdown("---")
 
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.subheader("🎯 Overall Profile Match")
+                        st.plotly_chart(results["fig"], use_container_width=True)
+                    with col2:
+                        st.subheader("💡 Competency Block Coverage")
+                        st.write("This shows how well your profile covers different skill areas.")
+                        block_names = list(results["block_scores"].keys())
+                        block_values = list(results["block_scores"].values())
+                        bar_fig = go.Figure([go.Bar(x=block_values, y=block_names, orientation='h', text=block_values, textposition='auto', marker_color='#4169E1')])
+                        bar_fig.update_layout(title="Coverage per Skill Category (%)", xaxis_title="Coverage Score", yaxis_title="Competency Block")
+                        st.plotly_chart(bar_fig, use_container_width=True)
+                else:
+                    st.error("❌ Could not process your profile. Please check if the data files are available.")
+        else : 
+            submitted = False
+            st.warning("Please answer all the questions !!")
 
-
-
+        
 start()
