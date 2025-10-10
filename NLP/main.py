@@ -36,9 +36,12 @@ def graph_result(jobScores):
     bestJobsTitle = [job for job, score, topSkills in jobScores]
     bestJobsScoresValues = [round(score * 100, 2) for job, score, topSkills in jobScores]
 
+    maxScore=max(bestJobsScoresValues)
+    minScore=min(bestJobsScoresValues)
+
     fig = go.Figure(data=go.Scatterpolar(r=bestJobsScoresValues, theta=bestJobsTitle, fill='toself', name='Profile Match'))
     fig.update_layout(
-        polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+        polar=dict(radialaxis=dict(visible=True, range=[minScore-4, maxScore+1])),
         title="Overall Job Profile Match (Weighted)"
     )
     
@@ -149,7 +152,7 @@ def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,to
     blockCosineScores = blockCosineMatrix.max(axis=0)
 
     df_competencies["weightedScore"] = df_competencies.apply(
-        lambda row: row["similarity"] * (1 + 0.3*blockCosineScores[row['BlockID']-1]),
+        lambda row: row["similarity"] * (1 + 0.1*blockCosineScores[row['BlockID']-1]),
         axis=1
     )
 
