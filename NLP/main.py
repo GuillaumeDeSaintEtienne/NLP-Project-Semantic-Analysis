@@ -69,15 +69,15 @@ def loadData():
     return df_competencies,df_jobs
 
 
-def transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+def transformInDf(level_python, level_ai, level_visu, level_sql, level_token_embedding,
                         tools, languages, frameworks, data_types, preferred_domains,
                         experience_text, challenges, learning_goals):
     data = {
-        "level_data_analysis": level_data_analysis,
-        "level_ml": level_ml,
-        "level_nlp": level_nlp,
-        "level_data_eng": level_data_eng,
-        "level_cloud": level_cloud,
+        "level_python": level_python,
+        "level_ai": level_ai,
+        "level_visu": level_visu,
+        "level_sql": level_sql,
+        "level_token_embedding": level_token_embedding,
         "tools": tools,
         "languages": languages,
         "frameworks": frameworks,
@@ -105,11 +105,11 @@ def preprocessing(df):
         4: "Advanced",
         5: "Expert"
     }
-    mappingCompetence={"level_data_analysis":"python",
-                        "level_ml":"Artificial Intelligence",
-                        "level_nlp":"Visualization", 
-                        "level_data_eng":"SQL",
-                        "level_cloud":"Tokenization and embeddings"
+    mappingCompetence={"level_python":"python",
+                        "level_ai":"Artificial Intelligence",
+                        "level_visu":"Visualization", 
+                        "level_sql":"SQL",
+                        "level_token_embedding":"Tokenization and embeddings"
     }
     mappingExperience = {
         "experience_text":"My experience includes:  ",
@@ -131,12 +131,12 @@ def preprocessing(df):
     return df
 
 
-def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+def nlp(level_python, level_ai, level_visu, level_sql, level_token_embedding,
             tools, languages, frameworks, data_types, preferred_domains,
             experience_text, challenges, learning_goals
         ):
     
-    df_question=transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+    df_question=transformInDf(level_python, level_ai, level_visu, level_sql, level_token_embedding,
         tools, languages, frameworks, data_types, preferred_domains,
         experience_text, challenges, learning_goals)
     
