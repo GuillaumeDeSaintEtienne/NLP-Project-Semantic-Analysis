@@ -70,7 +70,8 @@ def loadData():
 
 
 def transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
-                  tools, languages, frameworks, data_types, preferred_domains, experience_text):
+                        tools, languages, frameworks, data_types, preferred_domains,
+                        experience_text, challenges, learning_goals):
     data = {
         "level_data_analysis": level_data_analysis,
         "level_ml": level_ml,
@@ -82,7 +83,9 @@ def transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, leve
         "frameworks": frameworks,
         "data_types": data_types,
         "preferred_domains": preferred_domains,
-        "experience_text": experience_text
+        "experience_text": experience_text,
+        "challenges" : challenges,
+        "learning_goals" : learning_goals
     }
     df = pd.DataFrame([data])
     return df
@@ -128,8 +131,15 @@ def preprocessing(df):
     return df
 
 
-def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text):
-    df_question=transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text)
+def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+            tools, languages, frameworks, data_types, preferred_domains,
+            experience_text, challenges, learning_goals
+        ):
+    
+    df_question=transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
+        tools, languages, frameworks, data_types, preferred_domains,
+        experience_text, challenges, learning_goals)
+    
     df_question=preprocessing(df_question)
     
     df_competencies, df_jobs = loadData()

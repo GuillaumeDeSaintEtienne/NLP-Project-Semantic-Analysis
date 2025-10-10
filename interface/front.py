@@ -27,11 +27,11 @@ def start():
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("📊 Rate Your Skills (1-Beginner, 5-Expert)")
-            level_data_analysis = st.slider("Data Analysis", 1, 5, 3)
-            level_ml = st.slider("Machine Learning / AI", 1, 5, 2)
-            level_nlp = st.slider("NLP / Computer Vision", 1, 5, 1)
-            level_data_eng = st.slider("Data Engineering", 1, 5, 2)
-            level_cloud = st.slider("Cloud / MLOps", 1, 5, 1)
+            level_data_analysis = st.slider("How much do you love python ?", 1, 5, 3)
+            level_ml = st.slider("Do you like working with AI ?", 1, 5, 2)
+            level_nlp = st.slider("Can you make art with data ?", 1, 5, 1)
+            level_data_eng = st.slider("How confident are you concerning your knoledge in SQL ?", 1, 5, 2)
+            level_cloud = st.slider("How familiar are you with tokkenization and embeddings ?", 1, 5, 1)
 
         with col2:
             st.subheader("💡 Domains & Tools")
@@ -43,13 +43,16 @@ def start():
         
         st.subheader("📝 Describe Your Experience")
         experience_text = st.text_area("Provide a summary of your projects and professional experience.", height=150)
+        challenges = st.text_area("What was the biggest challenge you faced in your projects, and how did you overcome it?", height=150)
+        learning_goals = st.text_area("What skills or domains are you looking to improve or learn next?", height=100)
 
         submitted = st.form_submit_button("🔍 Find My Job")
 
     if submitted:
         if all([level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
-        tools, languages, frameworks, data_types, preferred_domains,
-        experience_text]):
+                tools, languages, frameworks, data_types, preferred_domains,
+                experience_text, challenges, learning_goals
+                ]):
         
             if not all([tools, languages, frameworks, experience_text]):
                 st.warning("⚠️ Please fill in all the text fields for an accurate analysis!")
@@ -58,7 +61,7 @@ def start():
                     results = main.nlp(
                         level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,
                         tools, languages, frameworks, data_types, preferred_domains,
-                        experience_text
+                        experience_text, challenges, learning_goals
                     )
 
                 if results:
