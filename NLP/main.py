@@ -23,7 +23,8 @@ nltk.download('wordnet')
 
 # --- Étape 1: Chargement du modèle et des données ---
 print("Loading SBERT model...")
-model = SentenceTransformer('all-mpnet-base-v2')
+#MODEL_ID = 'all-MiniLM-L6-v2'
+MODEL_ID = 'all-mpnet-base-v2'
 print("Model loaded.")
 
 
@@ -102,10 +103,10 @@ def preprocessing(df):
         5: "Expert"
     }
     mappingCompetence={"level_data_analysis":"python",
-                        "level_ml":"Machine Learning",
-                        "level_nlp":"NLP", 
-                        "level_data_eng":"Tokenization",
-                        "level_cloud":"Cloud Computing"
+                        "level_ml":"Artificial Intelligence",
+                        "level_nlp":"Visualization", 
+                        "level_data_eng":"SQL",
+                        "level_cloud":"Tokenization and embeddings"
     }
     mappingExperience = {
         "experience_text":"My experience includes:  ",
@@ -133,8 +134,7 @@ def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,to
     
     df_competencies, df_jobs = loadData()
 
-    #model = SentenceTransformer('all-MiniLM-L6-v2')
-    model = SentenceTransformer('all-mpnet-base-v2')
+    model = SentenceTransformer(MODEL_ID)
 
     listQuestion=df_question.iloc[0]
     userEmbedding = model.encode(listQuestion, convert_to_tensor=True)
