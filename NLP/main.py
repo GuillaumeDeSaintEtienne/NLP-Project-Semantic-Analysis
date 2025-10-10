@@ -1,18 +1,25 @@
 import pandas as pd 
-import numpy as np 
-import re 
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, precision_score, recall_score
+from sentence_transformers import SentenceTransformer, util
 import plotly.graph_objects as go
-import nltk
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
+from pathlib import Path
+import numpy as np
 
-def graph_result():
+MODEL_ID = "all-MiniLM-L6-v2"
+
+data_path = Path.cwd() / "data"
+ 
+
+def loadData():
+
+    df_competencies = pd.read_csv(data_path / r"competencies.csv", sep=",")
+    df_jobs = pd.read_csv(data_path / r"jobs.csv", sep=",")
+
+    df_jobs["RequiredCompetencies"] = df_jobs["RequiredCompetencies"].apply(lambda x: x.split(";"))
+
+    return df_competencies,df_jobs
+
+
+def graph_result(df_jobs, block_scores):
     fig = go.Figure()
 
     categories = ['Technical Skills', 'Analytical Thinking', 'Communication', 'Creativity', 'Domain Knowledge']
@@ -56,13 +63,57 @@ def transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, leve
     return df
 
 def preprocessing(df):
-    return None
+    for col in df.columns:
+        if "level" in col : 
+            df[col] = df[col].astype(int)
+        else : 
+            df[col] = df[col].astype(str)
+
+    return df
+
+def processing_user_input(df, model):
+    user_embeddings = []
+    for col in df.columns:
+        if df[col].dtype != "int":
+            user_embeddings.append(model.encode(df[col].astype(str).tolist(), convert_to_tensor=True)) 
+    return user_embeddings
+
+
+
+def score(df, df_competencies, model):
+    user_embeddings = processing_user_input(df, model)
+    block_scores = {}
+
+    for block in df_competencies["BlockName"].unique():
+        # Get all competencies for this block and make sure they are strings
+        competencies = df_competencies["Competency"][df_competencies["BlockName"] == block]
+        block_embeddings = model.encode([str(c) for c in competencies if pd.notna(c)], convert_to_tensor=True)
+
+        all_max_sims = []
+
+        # Loop over each column's embeddings
+        for col_emb in user_embeddings:
+            similarities = util.cos_sim(col_emb, block_embeddings)
+            max_similarities = [float(sim.max()) for sim in similarities]
+            all_max_sims.extend(max_similarities)
+
+        block_scores[block] = np.mean(all_max_sims)
+
+    return block_scores
 
 
 
 def nlp(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text):
     df=transformInDf(level_data_analysis, level_ml, level_nlp, level_data_eng, level_cloud,tools, languages, frameworks, data_types, preferred_domains,experience_text)
+    df_competencies, df_jobs = loadData()
     df=preprocessing(df)
-    fig = graph_result()
+
+    block_scores = score(df, df_competencies, SentenceTransformer(MODEL_ID))
+    
+
+    fig = graph_result(df_jobs, block_scores)
 
     return fig
+
+
+
