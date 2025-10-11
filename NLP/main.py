@@ -6,6 +6,7 @@ from pathlib import Path
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize 
 from sentence_transformers import SentenceTransformer, util
+import math
 
 nltk.download('punkt')
 nltk.download('punkt_tab')  
@@ -131,6 +132,17 @@ def nlp(level_python, level_ai, level_visu, level_sql, level_token_embedding,
     
     df_competencies, df_jobs = loadData()
 
+    total_jobs = len(df_jobs)
+    # Explode the list of competencies for each job to count occurrences
+    competency_counts = df_jobs.explode('RequiredCompetencies')['RequiredCompetencies'].value_counts().to_dict()
+
+    # Calculate IDF score for each competency and add it as a new column
+    def calculate_idf(competency_id):
+        count = competency_counts.get(competency_id, 0)
+        return math.log(total_jobs / (count + 1))
+
+    df_competencies['idf_score'] = df_competencies['CompetencyID'].apply(calculate_idf)
+
     model = SentenceTransformer(MODEL_ID)
 
     listQuestion=df_question.iloc[0]
@@ -159,10 +171,27 @@ def nlp(level_python, level_ai, level_visu, level_sql, level_token_embedding,
     jobScores = []
  
     for _, job in df_jobs.iterrows():
+        # Get the full competency details (including the new idf_score)
         jobComps = df_competencies[df_competencies["CompetencyID"].isin(job["RequiredCompetencies"])]
-        topCompScores = jobComps.sort_values(by='weightedScore', ascending=False).head(3)
-
-        jobScore = jobComps["weightedScore"].mean() if not jobComps.empty else 0
+        
+        # --- MODIFIÉ : Calcul du score du métier avec pondération IDF ---
+        if not jobComps.empty:
+            # Multiply the user's match score by the competency's rarity score
+            weighted_job_score = (jobComps['weightedScore'] * jobComps['idf_score']).sum()
+            
+            # We normalize by the sum of IDF scores to avoid bias towards jobs with more skills
+            sum_of_idf = jobComps['idf_score'].sum()
+            
+            # The final score is a weighted average
+            jobScore = weighted_job_score / sum_of_idf if sum_of_idf > 0 else 0
+            
+            # Get the top skills based on the user's score for them, not their rarity
+            topCompScores = jobComps.sort_values(by='weightedScore', ascending=False).head(3)
+        else:
+            jobScore = 0
+            topCompScores = pd.DataFrame(columns=["Competency"]) # Ensure it's an empty list if no comps
+        # --- FIN DE LA MODIFICATION ---
+        
         jobScores.append((
             job["JobTitle"],
             jobScore,
