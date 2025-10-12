@@ -76,16 +76,10 @@ nbdime config-git --enable
 
 ### Run the project
 
-#### ▶️ Run the main script
-This script performs the core semantic analysis:
-```bash
-python NLP/main.py
-```
-
 #### 🌐 Launch the Streamlit interface
 To visualize and interact with results:
 ```bash
-streamlit run interface/exemple_streamlit.py
+streamlit run interface/front.py
 ```
 
 ---
@@ -121,11 +115,8 @@ venv\Scripts\activate       # or: source venv/bin/activate on Mac/Linux
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the main script
-python NLP/main.py
-
 # Launch the Streamlit interface
-streamlit run interface/exemple_streamlit.py
+streamlit run interface/front.py
 ```
 
 ---
