@@ -4,15 +4,14 @@ import pandas as pd
 import sys
 import os
 
-# --- Corrected Path Handling ---
-# Get the absolute path of the current file's directory (interface/)
+#Get the absolute path of the current file's directory (interface/)
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# Get the path of the parent directory (the project root)
+#Get the path of the parent directory (the project root)
 project_root = os.path.dirname(current_dir)
-# Add the project root to the system's path
+#Add the project root to the system's path
 sys.path.append(project_root)
 
-# Now, Python can find the NLP module which is in a sibling directory
+#Now, Python can find the NLP module which is in a sibling directory
 from NLP import main
 
 def start():
@@ -23,7 +22,7 @@ def start():
     with st.form("job_form"):
         st.header("👤 Your Profile")
 
-        # Using columns for a cleaner layout
+        #Using columns for a cleaner layout
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("📊 Rate Your Skills (1-Beginner, 5-Expert)")
