@@ -13,6 +13,33 @@ The repository includes:
 
 ---
 
+## GANTT
+```mermaid
+gantt
+    dateFormat  YYYY-MM-DD
+    title       Job Recommendation Project — GANTT
+    excludes    weekends
+
+    section Week 1 - Setup & Data
+    Planning & Kickoff          :    planning, 2025-10-01, 2d
+    Data gathering & cleaning   :active,  data,    2025-10-03, 3d
+    Quick EDA and schema review :         eda,     2025-10-06, 1d
+
+    section Week 1-2 - Core NLP
+    Text preprocessing & mapping:         preprocess, 2025-10-07, 2d
+    Model experiments (MiniLM / mpnet):crit, model, 2025-10-07, 4d
+    Embedding pipeline & scoring :         pipeline, 2025-10-09, 2d
+
+    section Week 2 - Frontend & Integration
+    Streamlit frontend dev      :         frontend, 2025-10-10, 2d
+    Integration (NLP ↔ Frontend) :         integrate, 2025-10-10, 2d
+    Testing & bugfixing         :         test,      2025-10-11, 1d
+
+    section Finalization
+    Documentation & notebook    :milestone, docs, 2025-10-12, 1d
+    Final review & presentation :         final,    2025-10-12, 1d
+```
+
 ## 🗂️ Project Structure
 
 ```
