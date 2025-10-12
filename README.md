@@ -23,8 +23,7 @@ NLP-PROJECT-SEMANTIC-ANALYSIS/
 │   └── jobs.csv                # Job offers dataset
 │
 ├── interface/
-│   ├── exemple_question.py     # NLP example script
-│   └── exemple_streamlit.py    # Streamlit web app
+│   └── front.py                # Front Streamlit web app
 │
 ├── NLP/
 │   ├── main.ipynb              # Jupyter notebook for testing
@@ -41,13 +40,13 @@ NLP-PROJECT-SEMANTIC-ANALYSIS/
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the repository
+### Clone the repository
 ```bash
 git clone https://github.com/GuillaumeDeSaintEtienne/NLP-Project-Semantic-Analysis.git
 cd NLP-Project-Semantic-Analysis
 ```
 
-### 2️⃣ Create and activate a virtual environment
+### Create and activate a virtual environment
 
 On **Windows**:
 ```bash
@@ -63,7 +62,7 @@ source venv/bin/activate
 
 ---
 
-### 3️⃣ Install dependencies
+### Install dependencies
 Once the virtual environment is activated, install the required Python libraries:
 ```bash
 pip install -r requirements.txt
@@ -75,7 +74,7 @@ nbdime config-git --enable
 ```
 ---
 
-### 4️⃣ Run the project
+### Run the project
 
 #### ▶️ Run the main script
 This script performs the core semantic analysis:
@@ -91,7 +90,7 @@ streamlit run interface/exemple_streamlit.py
 
 ---
 
-### 5️⃣ Explore the Jupyter Notebook
+### Explore the Jupyter Notebook
 The file `NLP/main.ipynb` contains test cells and visualizations.  
 Open it with **Jupyter Notebook** or **VS Code**:
 ```bash
@@ -100,7 +99,7 @@ jupyter notebook NLP/main.ipynb
 
 ---
 
-### 6️⃣ (Optional) Run with Docker
+### (Optional) Run with Docker
 If you prefer to use Docker:
 
 ```bash
@@ -113,7 +112,7 @@ Once the container is running, open:
 
 ---
 
-### ✅ Quick command summary
+### Quick command summary
 ```bash
 # Create and activate virtual environment
 python -m venv venv
@@ -131,7 +130,7 @@ streamlit run interface/exemple_streamlit.py
 
 ---
 
-## 🧩 Technologies
+## Technologies
 - **Python 3.10+**
 - **Streamlit** – Web app interface  
 - **Pandas / NumPy** – Data processing  
@@ -140,10 +139,21 @@ streamlit run interface/exemple_streamlit.py
 
 ---
 
-## 🧠 Goal
+## Goal
 To analyze and compare **job descriptions** and **competencies** based on **semantic similarity**, helping match profiles and labor market needs.
 
 ---
 
-## 👤 Author
+## Author
 Academic project developed for research in **Natural Language Processing (NLP)** and **Semantic Analysis**.
+
+**Developed by :**
+- GALLIOU Mael
+- GAUDE Corentin
+- COUDEVILLE Masao
+- DE SAINT ETIENNE Guillaume
+- GODET Emilien
+- FRANCFORT Sacha
+- BOULIC Alexis
+
+**ECE - ING5 Data & IA Inter - Grp 1 - 2025**
