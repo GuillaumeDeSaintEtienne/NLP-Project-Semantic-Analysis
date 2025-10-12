@@ -30,7 +30,6 @@ NLP-PROJECT-SEMANTIC-ANALYSIS/
 │   └── main.py                 # Main Python script
 │
 ├── .gitignore
-├── dockerfile
 ├── Project - Semantic Analysis.pdf   # Project documentation
 ├── README.md
 └── requirements.txt           # Python dependencies
@@ -90,19 +89,6 @@ Open it with **Jupyter Notebook** or **VS Code**:
 ```bash
 jupyter notebook NLP/main.ipynb
 ```
-
----
-
-### (Optional) Run with Docker
-If you prefer to use Docker:
-
-```bash
-docker build -t nlp-semantic .
-docker run -p 8501:8501 nlp-semantic
-```
-
-Once the container is running, open:  
-👉 [http://localhost:8501](http://localhost:8501)
 
 ---
 
