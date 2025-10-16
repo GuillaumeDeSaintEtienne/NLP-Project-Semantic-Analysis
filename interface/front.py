@@ -26,11 +26,11 @@ def start():
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("📊 Rate Your Skills (1-Beginner, 5-Expert)")
-            level_python = st.slider("How much do you love python ?", 1, 5, 3)
+            level_python = st.slider("How much do you love Python ?", 1, 5, 3)
             level_ai = st.slider("Do you like working with AI ?", 1, 5, 2)
             level_visu = st.slider("Can you make art with data ?", 1, 5, 1)
-            level_sql = st.slider("How confident are you concerning your knoledge in SQL ?", 1, 5, 2)
-            level_token_embedding = st.slider("How familiar are you with tokkenization and embeddings ?", 1, 5, 1)
+            level_sql = st.slider("How confident are you concerning your knowledge in SQL ?", 1, 5, 2)
+            level_token_embedding = st.slider("How familiar are you with tokenization and embeddings ?", 1, 5, 1)
 
         with col2:
             st.subheader("💡 Domains & Tools")
