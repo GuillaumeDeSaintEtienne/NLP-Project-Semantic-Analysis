@@ -20,7 +20,7 @@ print("Model loaded.")
 data_path = Path.cwd() / "data"
 
 
-
+TFIDF = False
 
 
 def graph_result(jobScores):
@@ -175,7 +175,10 @@ def nlp(level_python, level_ai, level_visu, level_sql, level_token_embedding,
         
         if not jobComps.empty:
             #Multiply the user's match score by the competency's rarity score
-            weighted_job_score = (jobComps['weightedScore'] * jobComps['idf_score']).sum()
+            if TFIDF :
+                weighted_job_score = (jobComps['weightedScore'] * jobComps['idf_score']).sum()
+            else :
+                weighted_job_score = jobComps['weightedScore'].sum()
             
             #We normalize by the sum of IDF scores to avoid bias towards jobs with more skills
             sum_of_idf = jobComps['idf_score'].sum()
